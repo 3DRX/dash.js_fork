@@ -40,6 +40,7 @@ function BBA0Rule(config) {
     }
 
     function getMaxIndex(rulesContext) {
+        console.log('using BBA0Rule');
         const mediaInfo = rulesContext.getMediaInfo();
         const mediaType = rulesContext.getMediaInfo().type;
         const metrics = metricsModel.getMetricsFor(mediaType, true);
@@ -113,6 +114,7 @@ function BBA0Rule(config) {
     }
 
     function reset() {
+        ratePrev = 0;
     }
 
     let instance = {
@@ -120,7 +122,6 @@ function BBA0Rule(config) {
         reset: reset
     };
 
-    console.log('using BBA0Rule');
     return instance;
 }
 

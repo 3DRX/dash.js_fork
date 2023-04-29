@@ -81,7 +81,17 @@ function ABRRulesCollection(config) {
                         dashMetrics: dashMetrics
                     })
                 );
-            } else {
+            }
+            else if (settings.get().streaming.abr.ABRStrategy === Constants.ABR_STRATEGY_BBA0) {
+                qualitySwitchRules.push(
+                    BBA0Rule(context).create({
+                        dashMetrics: dashMetrics,
+                        mediaPlayerModel: mediaPlayerModel,
+                        settings: settings
+                    })
+                )
+            }
+            else {
                 // Only one of BolaRule and ThroughputRule will give a switchRequest.quality !== SwitchRequest.NO_CHANGE.
                 // This is controlled by useBufferOccupancyABR mechanism in AbrController.
                 qualitySwitchRules.push(
@@ -97,14 +107,6 @@ function ABRRulesCollection(config) {
                         dashMetrics: dashMetrics
                     })
                 );
-
-                qualitySwitchRules.push(
-                    BBA0Rule(context).create({
-                        dashMetrics: dashMetrics,
-                        mediaPlayerModel: mediaPlayerModel,
-                        settings: settings
-                    })
-                )
 
                 if (settings.get().streaming.abr.additionalAbrRules.insufficientBufferRule) {
                     qualitySwitchRules.push(
@@ -141,7 +143,7 @@ function ABRRulesCollection(config) {
 
         // add custom ABR rules if any
         const customRules = customParametersModel.getAbrCustomRules();
-        customRules.forEach(function (rule) {
+        customRules.forEach(function(rule) {
             if (rule.type === QUALITY_SWITCH_RULES) {
                 qualitySwitchRules.push(rule.rule(context).create());
             }
