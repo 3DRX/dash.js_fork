@@ -7,3 +7,5 @@ so the forking process is not done on GitHub, which forces the fork to be public
 The fork is for educational purposes only.
 
 The original README of dash.js can be found [here](./original_README.md).
+
+My [notes](./NOTES.md) taken while reading the source code.

@@ -320,6 +320,19 @@
                         </label>
                     </div>
                 </div>
+
+                <div class="sub-options-item">
+                    <div class="sub-options-item-title">Custom ABR Strategy</div>
+                    <div class="sub-options-item-body">
+                        <label data-toggle="tooltip" data-placement="right"
+                               title="Choose bitrate using the BBA-0 algorithm.">
+                            <input type="radio" id="abrBBA0" autocomplete="off" name="abrStrategy"
+                                   ng-model="ABRStrategy"
+                                   ng-click="changeABRStrategy('abrBBA0')" value="abrBBA0">
+                            ABR Strategy: BBA-0
+                        </label>
+                    </div>
+                </div>
                 <div class="sub-options-item">
                     <div class="sub-options-item-title">LL throughput calculation</div>
                     <div class="sub-options-item-body">

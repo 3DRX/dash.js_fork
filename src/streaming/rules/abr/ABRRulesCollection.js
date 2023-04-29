@@ -35,6 +35,7 @@ import DroppedFramesRule from './DroppedFramesRule';
 import SwitchHistoryRule from './SwitchHistoryRule';
 import BolaRule from './BolaRule';
 import L2ARule from './L2ARule.js';
+import BBA0Rule from './BBA0Rule';
 import LoLPRule from './lolp/LoLpRule.js';
 import FactoryMaker from '../../../core/FactoryMaker';
 import SwitchRequest from '../SwitchRequest';
@@ -96,6 +97,14 @@ function ABRRulesCollection(config) {
                         dashMetrics: dashMetrics
                     })
                 );
+
+                qualitySwitchRules.push(
+                    BBA0Rule(context).create({
+                        dashMetrics: dashMetrics,
+                        mediaPlayerModel: mediaPlayerModel,
+                        settings: settings
+                    })
+                )
 
                 if (settings.get().streaming.abr.additionalAbrRules.insufficientBufferRule) {
                     qualitySwitchRules.push(

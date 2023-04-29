@@ -150,6 +150,8 @@ class Constants {
          */
         this.ABR_STRATEGY_THROUGHPUT = 'abrThroughput';
 
+        this.ABR_STRATEGY_BBA0 = 'abrBBA0';
+
         /**
          *  @constant {string} ABR_FETCH_THROUGHPUT_CALUCUALTION_DOWNLOADED_DATA Throughput calculation based on downloaded data array
          *  @memberof Constants#
