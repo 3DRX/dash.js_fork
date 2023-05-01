@@ -1,23 +1,11 @@
-import MetricsConstants from '../../constants/MetricsConstants';
 import SwitchRequest from '../SwitchRequest';
 import FactoryMaker from '../../../core/FactoryMaker';
-import { HTTPRequest } from '../../vo/metrics/HTTPRequest';
-import EventBus from '../../../core/EventBus';
-import Events from '../../../core/events/Events';
-import Debug from '../../../core/Debug';
-import MediaPlayerEvents from '../../MediaPlayerEvents';
-import Constants from '../../constants/Constants';
-import MetricsModel from '../../models/MetricsModel';
 
 function BBA0Rule(config) {
 
     config = config || {};
     const context = this.context;
-
     const dashMetrics = config.dashMetrics;
-    const mediaPlayerModel = config.mediaPlayerModel;
-    let metricsModel = MetricsModel(context).getInstance();
-    const eventBus = EventBus(context).getInstance();
     const reservoir = 8;
     const cushion = 30;
     let ratePrev = 0;
@@ -43,18 +31,35 @@ function BBA0Rule(config) {
     }
 
     function getMaxIndex(rulesContext) {
+
+        // what's in rulesContext:
+        //
+        // instance = {
+        //     getMediaType,
+        //     getMediaInfo,
+        //     getDroppedFramesHistory,
+        //     getCurrentRequest,
+        //     getSwitchHistory,
+        //     getStreamInfo,
+        //     getScheduleController,
+        //     getAbrController,
+        //     getRepresentationInfo,
+        //     useBufferOccupancyABR,
+        //     useL2AABR,
+        //     useLoLPABR,
+        //     getVideoModel
+        // };
+
         console.log("==========================================");
-        const mediaInfo = rulesContext.getMediaInfo();
-        // console.log(`mediaInfo: ${JSON.stringify(mediaInfo)}`);
-        const mediaType = rulesContext.getMediaInfo().type;
-        // console.log(`mediaType: ${mediaType}`);
-        const metrics = metricsModel.getMetricsFor(mediaType, true);
-        // console.log(`metrics: ${JSON.stringify(metrics)}`);
-        const abrController = rulesContext.getAbrController();
-        // console.log(`abrController: ${JSON.stringify(abrController)}`);
         const switchRequest = SwitchRequest(context).create();
-        // console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
-        // console.log("==========================================");
+        const mediaInfo = rulesContext.getMediaInfo();
+        const streamInfo = rulesContext.getStreamInfo();
+        const streamId = streamInfo ? streamInfo.id : null;
+        const mediaType = rulesContext.getMediaInfo().type;
+        console.log(`mediaType: ${JSON.stringify(mediaType)}`);
+        const abrController = rulesContext.getAbrController();
+        const throughputHistory = abrController.getThroughputHistory();
+        const latency = throughputHistory.getAverageLatency(mediaType);
 
         if (mediaType === 'video') {
             let bitrateList = abrController.getBitrateList(mediaInfo);
@@ -64,22 +69,6 @@ function BBA0Rule(config) {
             let step = cushion / (bitrateList.length - 1);
             for (let i = 0; i < bitrateList.length; i++) {
                 rateMap[reservoir + i * step] = bitrateList[i].bitrate;
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-                // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
             }
             let rateMax = bitrateList[bitrateList.length - 1].bitrate;
             let rateMin = bitrateList[0].bitrate;
@@ -112,23 +101,7 @@ function BBA0Rule(config) {
             }
             console.log(`ratePlus: ${ratePlus}`);
             console.log(`rateMinus: ${rateMinus}`);
-            let currentBufferLevel = dashMetrics.getCurrentBufferLevel(metrics);
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
+            let currentBufferLevel = dashMetrics.getCurrentBufferLevel(mediaType);
             console.log(`currentBufferLevel: ${currentBufferLevel}`);
             let fCurrentBufferLevel = fun(currentBufferLevel, step, rateMap);
             console.log(`fCurrentBufferLevel: ${fCurrentBufferLevel}`);
@@ -159,7 +132,14 @@ function BBA0Rule(config) {
                 rateNext = ratePrev;
             }
             ratePrev = rateNext;
-            switchRequest.quality = abrController.getQualityForBitrate(mediaInfo, rateNext / 1000, 0);
+            console.log(`rateNext: ${rateNext}`);
+            for (let i = 0; i < bitrateList.length; i++) {
+                if (bitrateList[i].bitrate === rateNext) {
+                    switchRequest.quality = bitrateList[i].qualityIndex;
+                    console.log(`quality: ${switchRequest.quality}`);
+                    break;
+                }
+            }
         } else {
             switchRequest.quality = 0;
         }
