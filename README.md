@@ -82,8 +82,11 @@ Testing BOLA (left) and BBA0 (right) side by side.
 
 ![benchmark](./README.assets/benchmark.png)
 
-The logging server, implemented in node.js with express,
+[The logger](https://github.com/3DRX/stuck_tracker),
+implemented in node.js with express,
 stores each post message in a new line of `log.txt`.
+
+![log.txt](./README.assets/log.png)
 
 After the test finished, another program can parse `log.txt`
 and compare the likelihood of BOLA and BBA0 cause a stuck.
