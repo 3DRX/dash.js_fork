@@ -86,8 +86,6 @@ function ABRRulesCollection(config) {
                 qualitySwitchRules.push(
                     BBA0Rule(context).create({
                         dashMetrics: dashMetrics,
-                        mediaPlayerModel: mediaPlayerModel,
-                        settings: settings
                     })
                 )
             }
@@ -212,11 +210,17 @@ function ABRRulesCollection(config) {
     }
 
     function getMaxQuality(rulesContext) {
+        console.log(`[ABRController] qualitySwitchRules: ${JSON.stringify(qualitySwitchRules)}`);
         const switchRequestArray = qualitySwitchRules.map(rule => rule.getMaxIndex(rulesContext));
+        console.log(`[ABRController] switchRequestArray: ${JSON.stringify(switchRequestArray)}`)
         const activeRules = _getRulesWithChange(switchRequestArray);
         const maxQuality = getMinSwitchRequest(activeRules);
 
-        return maxQuality || SwitchRequest(context).create();
+        const res = maxQuality || SwitchRequest(context).create();
+
+        console.log(`[ABRController] getMaxQuality: ${JSON.stringify(res)}`)
+
+        return res;
     }
 
     function shouldAbandonFragment(rulesContext, streamId) {

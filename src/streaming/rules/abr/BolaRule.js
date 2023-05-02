@@ -384,11 +384,14 @@ function BolaRule(config) {
     }
 
     function getMaxIndex(rulesContext) {
+        console.log("==========================================");
         const switchRequest = SwitchRequest(context).create();
+        console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
 
         if (!rulesContext || !rulesContext.hasOwnProperty('getMediaInfo') || !rulesContext.hasOwnProperty('getMediaType') ||
             !rulesContext.hasOwnProperty('getScheduleController') || !rulesContext.hasOwnProperty('getStreamInfo') ||
             !rulesContext.hasOwnProperty('getAbrController') || !rulesContext.hasOwnProperty('useBufferOccupancyABR')) {
+            console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
             return switchRequest;
         }
         const mediaInfo = rulesContext.getMediaInfo();
@@ -403,6 +406,7 @@ function BolaRule(config) {
         switchRequest.reason = switchRequest.reason || {};
 
         if (!useBufferOccupancyABR) {
+            console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
             return switchRequest;
         }
 
@@ -412,6 +416,7 @@ function BolaRule(config) {
 
         if (bolaState.state === BOLA_STATE_ONE_BITRATE) {
             // shouldn't even have been called
+            console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
             return switchRequest;
         }
 
@@ -427,6 +432,7 @@ function BolaRule(config) {
 
         if (isNaN(throughput)) { // isNaN(throughput) === isNaN(safeThroughput) === isNaN(latency)
             // still starting up - not enough information
+            console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
             return switchRequest;
         }
 
@@ -510,6 +516,7 @@ function BolaRule(config) {
                 clearBolaStateOnSeek(bolaState);
         }
 
+        console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
         return switchRequest;
     }
 

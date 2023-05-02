@@ -6,8 +6,9 @@ function BBA0Rule(config) {
     config = config || {};
     const context = this.context;
     const dashMetrics = config.dashMetrics;
-    const reservoir = 8;
-    const cushion = 30;
+    // the value of reservoir and cushion should be tuned
+    const reservoir = 2;
+    const cushion = 8;
     let ratePrev = 0;
 
     function comp(propertyName) {
@@ -60,6 +61,17 @@ function BBA0Rule(config) {
         const abrController = rulesContext.getAbrController();
         const throughputHistory = abrController.getThroughputHistory();
         const latency = throughputHistory.getAverageLatency(mediaType);
+        const isDynamic = streamInfo && streamInfo.manifestInfo && streamInfo.manifestInfo.isDynamic;
+        const throughput = throughputHistory.getAverageThroughput(mediaType, isDynamic); // In kbits/s
+
+        if (!rulesContext || !rulesContext.hasOwnProperty('getMediaInfo') || !rulesContext.hasOwnProperty('getMediaType') ||
+            !rulesContext.hasOwnProperty('getScheduleController') || !rulesContext.hasOwnProperty('getStreamInfo') ||
+            !rulesContext.hasOwnProperty('getAbrController')) {
+            return switchRequest;
+        }
+
+        switchRequest.reason = switchRequest.reason || {};
+        console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
 
         if (mediaType === 'video') {
             let bitrateList = abrController.getBitrateList(mediaInfo);
@@ -114,7 +126,7 @@ function BBA0Rule(config) {
             }
             else if (fCurrentBufferLevel >= ratePlus) {
                 for (let i = bitrateList.length - 1; i >= 0; i--) {
-                    if (bitrateList[i].bitrate <= fCurrentBufferLevel) {
+                    if (bitrateList[i].bitrate < fCurrentBufferLevel) {
                         rateNext = bitrateList[i].bitrate;
                         break;
                     }
@@ -140,9 +152,16 @@ function BBA0Rule(config) {
                     break;
                 }
             }
+
+            switchRequest.reason.state = 2;
+            switchRequest.reason.throughput = throughput;
+            switchRequest.reason.latency = latency;
+            switchRequest.reason.bufferLevel = currentBufferLevel;
         } else {
-            switchRequest.quality = 0;
+            switchRequest.quality = -1;
+            switchRequest.reason = null;
         }
+        console.log(`switchRequest: ${JSON.stringify(switchRequest)}`);
         return switchRequest;
     }
 
