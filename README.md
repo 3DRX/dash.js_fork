@@ -69,3 +69,22 @@ To run this, first `npm install`, and then `npm run start`.
 
 ![run demo](./README.assets/demo.jpg)
 
+## Benchmarking
+
+I did a drag race between the BBA0 algorithm I implemented
+and the default BOLA algorithm in Dash.js.
+My approach is to send a post request to a discrete logging service
+every time the buffer is empty
+(which also means the video stuck, and the user had a bad experience).
+The post request contains which algorithm is sending the request.
+
+Testing BOLA (left) and BBA0 (right) side by side.
+
+![benchmark](./README.assets/benchmark.png)
+
+The logging server, implemented in node.js with express,
+stores each post message in a new line of `log.txt`.
+
+After the test finished, another program can parse `log.txt`
+and compare the likelihood of BOLA and BBA0 cause a stuck.
+
