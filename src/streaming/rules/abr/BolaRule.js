@@ -40,6 +40,7 @@ import Events from '../../../core/events/Events';
 import Debug from '../../../core/Debug';
 import MediaPlayerEvents from '../../MediaPlayerEvents';
 import Constants from '../../constants/Constants';
+import axios from 'axios';
 
 // BOLA_STATE_ONE_BITRATE   : If there is only one bitrate (or initialization failed), always return NO_CHANGE.
 // BOLA_STATE_STARTUP       : Set placeholder buffer such that we download fragments at most recently measured throughput.
@@ -269,6 +270,14 @@ function BolaRule(config) {
                 bolaStateDict[mediaType].placeholderBuffer = 0;
             }
         }
+        console.log("onBufferEmpty");
+        axios.post('http://10.0.0.19:3000/stop?abr=Bola')
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     function onPlaybackSeeking() {

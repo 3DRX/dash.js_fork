@@ -1,11 +1,15 @@
 import SwitchRequest from '../SwitchRequest';
 import FactoryMaker from '../../../core/FactoryMaker';
+import EventBus from '../../../core/EventBus';
+import MediaPlayerEvents from '../../MediaPlayerEvents';
+import axios from 'axios';
 
 function BBA0Rule(config) {
 
     config = config || {};
     const context = this.context;
     const dashMetrics = config.dashMetrics;
+    const eventBus = EventBus(context).getInstance();
     // the value of reservoir and cushion should be tuned
     const reservoir = 2;
     const cushion = 8;
@@ -165,14 +169,31 @@ function BBA0Rule(config) {
         return switchRequest;
     }
 
+    function onBufferEmpty(e) {
+        console.log("onBufferEmpty");
+        axios.post('http://10.0.0.19:3000/stop?abr=BBA0')
+            .then((_response) => {
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    function setup() {
+        eventBus.on(MediaPlayerEvents.BUFFER_EMPTY, onBufferEmpty, instance);
+    }
+
     function reset() {
         ratePrev = 0;
+        eventBus.off(MediaPlayerEvents.BUFFER_EMPTY, onBufferEmpty, instance);
     }
 
     let instance = {
         getMaxIndex: getMaxIndex,
         reset: reset
     };
+
+    setup();
 
     return instance;
 }
