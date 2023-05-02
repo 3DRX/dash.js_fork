@@ -67,3 +67,5 @@ with node.js 16.19.1 installed by [nvm](https://github.com/nvm-sh/nvm).
 
 To run this, first `npm install`, and then `npm run start`.
 
+![run demo](./README.assets/demo.jpg)
+
