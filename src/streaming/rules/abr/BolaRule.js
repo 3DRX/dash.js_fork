@@ -271,7 +271,7 @@ function BolaRule(config) {
             }
         }
         console.log("onBufferEmpty");
-        axios.post('http://10.0.0.19:3000/stop?abr=Bola')
+        axios.post('http://10.128.185.201:3000/stop?abr=Bola')
             .then((response) => {
                 console.log(response);
             })

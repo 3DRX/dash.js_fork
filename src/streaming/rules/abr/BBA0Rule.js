@@ -171,7 +171,7 @@ function BBA0Rule(config) {
 
     function onBufferEmpty(e) {
         console.log("onBufferEmpty");
-        axios.post('http://10.0.0.19:3000/stop?abr=BBA0')
+        axios.post('http://10.128.185.201:3000/stop?abr=BBA0')
             .then((_response) => {
             })
             .catch((error) => {

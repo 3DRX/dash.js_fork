@@ -39,6 +39,8 @@ import EventBus from '../../../core/EventBus';
 import Events from '../../../core/events/Events';
 import Debug from '../../../core/Debug';
 import Constants from '../../constants/Constants';
+import MediaPlayerEvents from '../../MediaPlayerEvents';
+import axios from 'axios';
 
 const L2A_STATE_ONE_BITRATE = 0; // If there is only one bitrate (or initialization failed), always return NO_CHANGE.
 const L2A_STATE_STARTUP = 1; // Set placeholder buffer such that we download fragments at most recently measured throughput.
@@ -64,6 +66,7 @@ function L2ARule(config) {
         logger = Debug(context).getInstance().getLogger(instance);
         _resetInitialSettings();
 
+        eventBus.on(MediaPlayerEvents.BUFFER_EMPTY, onBufferEmpty, instance);
         eventBus.on(Events.PLAYBACK_SEEKING, _onPlaybackSeeking, instance);
         eventBus.on(Events.MEDIA_FRAGMENT_LOADED, _onMediaFragmentLoaded, instance);
         eventBus.on(Events.METRIC_ADDED, _onMetricAdded, instance);
@@ -466,11 +469,22 @@ function L2ARule(config) {
         l2AParameterDict = {};
     }
 
+    function onBufferEmpty(e) {
+        console.log("onBufferEmpty");
+        axios.post('http://10.128.185.201:3000/stop?abr=L2A')
+            .then((_response) => {
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
     /**
      * Reset the rule
      */
     function reset() {
         _resetInitialSettings();
+        eventBus.off(MediaPlayerEvents.BUFFER_EMPTY, onBufferEmpty, instance);
         eventBus.off(Events.PLAYBACK_SEEKING, _onPlaybackSeeking, instance);
         eventBus.off(Events.MEDIA_FRAGMENT_LOADED, _onMediaFragmentLoaded, instance);
         eventBus.off(Events.METRIC_ADDED, _onMetricAdded, instance);

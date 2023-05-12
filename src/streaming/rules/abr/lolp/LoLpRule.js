@@ -43,7 +43,10 @@ import LoLpQoeEvaluator from './LoLpQoEEvaluator';
 import SwitchRequest from '../../SwitchRequest';
 import MetricsConstants from '../../../constants/MetricsConstants';
 import LoLpWeightSelector from './LoLpWeightSelector';
+import MediaPlayerEvents from '../../../MediaPlayerEvents';
 import Constants from '../../../constants/Constants';
+import EventBus from '../../../../core/EventBus';
+import axios from 'axios';
 
 const DWS_TARGET_LATENCY = 1.5;
 const DWS_BUFFER_MIN = 0.3;
@@ -54,6 +57,7 @@ function LoLPRule(config) {
 
     let dashMetrics = config.dashMetrics;
     let context = this.context;
+    const eventBus = EventBus(context).getInstance();
 
     let logger,
         instance,
@@ -61,6 +65,7 @@ function LoLPRule(config) {
         qoeEvaluator;
 
     function _setup() {
+        eventBus.on(MediaPlayerEvents.BUFFER_EMPTY, onBufferEmpty, instance);
         logger = Debug(context).getInstance().getLogger(instance);
         learningController = LearningAbrController(context).create();
         qoeEvaluator = LoLpQoeEvaluator(context).create();
@@ -163,11 +168,22 @@ function LoLPRule(config) {
         qoeEvaluator.reset();
     }
 
+    function onBufferEmpty(e) {
+        console.log("onBufferEmpty");
+        axios.post('http://10.128.185.201:3000/stop?abr=LOLP')
+            .then((_response) => {
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
     /**
      * Reset the rule
      */
     function reset() {
         _resetInitialSettings();
+        eventBus.off(MediaPlayerEvents.BUFFER_EMPTY, onBufferEmpty, instance);
     }
 
     instance = {
